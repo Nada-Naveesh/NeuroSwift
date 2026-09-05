@@ -1,0 +1,27 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.streamlit/secrets.toml
+
+data/raw/
+data/processed/
+data/eegmmidb/
+*.edf
+*.fif
+*.npz
+logs/
+wandb/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
