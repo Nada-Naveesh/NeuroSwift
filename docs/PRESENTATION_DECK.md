@@ -1,4 +1,4 @@
-# 🎓 NeuroSwift: Final Year B.Tech Project Presentation & Viva Defense Guide
+# 🎓 NEURALIS: Final Year B.Tech Project Presentation & Viva Defense Guide
 
 **Project Title:** NeuroSwift: Motor Imagery EEG Classification Using Efficient Channel Attention and Multi-Scale Convolutional Neural Networks  
 **Student Name:** Nada Naveesh  
