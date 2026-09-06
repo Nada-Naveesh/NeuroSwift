@@ -3,7 +3,7 @@
 **Project Title:** NeuroSwift: Motor Imagery EEG Classification Using Efficient Channel Attention and Multi-Scale Convolutional Neural Networks  
 **Student Name:** Nada Naveesh  
 **Branch:** Artificial Intelligence and Machine Learning (AIML), 4th Year B.Tech  
-**Target Applications:** Final B.Tech Capstone Defense, IEEE/Springer Conference Publication, and German Master's Applications (M.Sc. in Neuroengineering / Artificial Intelligence / Biomedical Computing)
+**Target Applications:** Final B.Tech Capstone Defense, IEEE/Springer Conference Publication.
 
 ---
 
