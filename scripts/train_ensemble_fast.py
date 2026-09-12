@@ -13,6 +13,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 from models.neuroswift import NeuroSwiftModel
 from models.ensemble import EnsembleModel
 from training.config import CONFIG
@@ -81,10 +86,15 @@ def main():
 
         model = NeuroSwiftModel(CONFIG)
         if base_state is not None:
-            model.load_state_dict(base_state, strict=False)
+            try:
+                model.load_state_dict(base_state, strict=False)
+            except Exception as e:
+                print(f"  Note: Initializing fresh weights for sub-model {i+1} ({e})")
 
         optimizer = torch.optim.AdamW(model.parameters(), lr=0.0003, weight_decay=1e-4)
-        criterion = nn.CrossEntropyLoss()
+        weights = torch.FloatTensor([1.0, 1.0, 1.0, 1.0, 1.6])
+        criterion = nn.CrossEntropyLoss(weight=weights)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=6, eta_min=1e-6)
 
         train_loader = DataLoader(
             TensorDataset(torch.FloatTensor(X_tr), torch.LongTensor(y_tr)),
@@ -98,9 +108,9 @@ def main():
         )
 
         best_v_acc = 0.0
-        best_weights = model.state_dict()
+        best_weights = model.state_dict().copy()
 
-        for epoch in range(8):
+        for epoch in range(12):
             model.train()
             t_loss = 0.0
             for batch_x, batch_y in train_loader:
@@ -108,9 +118,11 @@ def main():
                 out = model(batch_x)
                 loss = criterion(out, batch_y)
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
                 optimizer.step()
                 t_loss += loss.item()
 
+            scheduler.step()
             model.eval()
             correct = 0
             total = 0

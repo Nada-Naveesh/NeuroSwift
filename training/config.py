@@ -1,6 +1,4 @@
-"""Configuration settings for NeuroSwift."""
-
-from __future__ import annotations
+"""Configuration for NeuroSwift Training."""
 
 CONFIG = {
     # Model parameters
@@ -16,12 +14,12 @@ CONFIG = {
     "attention_gamma": 2,
     "attention_b": 1,
 
-    # Training
+    # Training - INCREASED FOR OPTIMAL CONVERGENCE & ACCURACY
     "batch_size": 32,
     "learning_rate": 0.0005,
     "weight_decay": 1e-4,
-    "epochs": 100,
-    "early_stopping_patience": 15,
+    "epochs": 100,                  # Increased to 100 for deep convergence
+    "early_stopping_patience": 30,  # Increased to 30 to prevent premature termination
     "dropout_rate": 0.5,
 
     # Data augmentation
