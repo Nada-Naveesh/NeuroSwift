@@ -28,10 +28,12 @@ from src.config import CLASS_NAMES, DATA_PROCESSED_DIR, MODEL_WEIGHTS_PATH, REPO
 from training.utils import set_seed, stratified_splits
 
 
-def evaluate_model(model, X_test, y_test, class_names):
+def evaluate_model(model, X_test, y_test, class_names=None):
     """
     Evaluate model on test set and return all metrics.
     """
+    if class_names is None:
+        class_names = CLASS_NAMES
     device = next(model.parameters()).device if list(model.parameters()) else torch.device("cpu")
     model.eval()
     with torch.no_grad():

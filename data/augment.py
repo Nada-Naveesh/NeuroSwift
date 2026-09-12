@@ -4,7 +4,14 @@ from __future__ import annotations
 
 import numpy as np
 
-from preprocessing.augment import apply_window_augmentation, sliding_window_augmentation
+from preprocessing.augment import (
+    add_gaussian_noise,
+    advanced_augmentation,
+    amplitude_scale,
+    apply_advanced_augmentation,
+    apply_window_augmentation,
+    sliding_window_augmentation,
+)
 
 __all__ = [
     "sliding_window_augmentation",
@@ -14,6 +21,10 @@ __all__ = [
     "time_shift",
     "augment_trial",
     "augment_dataset",
+    "add_gaussian_noise",
+    "amplitude_scale",
+    "advanced_augmentation",
+    "apply_advanced_augmentation",
 ]
 
 

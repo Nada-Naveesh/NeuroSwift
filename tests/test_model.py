@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import torch
 
 from models.attention import ECABlock
@@ -39,3 +40,14 @@ def test_predict_proba_sums_to_one() -> None:
     proba = model.predict_proba(x)
     assert proba.shape == (2, NUM_CLASSES)
     assert torch.allclose(proba.sum(dim=-1), torch.ones(2), atol=1e-5)
+
+
+def test_ensemble_model_shapes() -> None:
+    from models.ensemble import EnsembleModel
+    ensemble = EnsembleModel(CONFIG, num_models=3)
+    x = np.random.randn(4, N_CHANNELS, N_TIMES).astype(np.float32)
+    preds = ensemble.predict(x)
+    assert preds.shape == (4,)
+    probs = ensemble.predict_proba(x)
+    assert probs.shape == (4, NUM_CLASSES)
+    assert np.allclose(probs.sum(axis=-1), np.ones(4), atol=1e-5)

@@ -98,7 +98,11 @@ def process_raw_to_trials(raw, filename: str):
 
 # Load model function
 @st.cache_resource
-def load_model():
+def load_models():
+    from models.neuroswift import NeuroSwiftModel
+    from models.ensemble import EnsembleModel
+    from training.config import CONFIG
+
     candidates = [
         "best_model_improved.pt",
         "best_model_final.pt",
@@ -106,6 +110,7 @@ def load_model():
         "checkpoints/best_model_effatt.pt",
         "checkpoints/best_model_final.pt",
     ]
+    single_model = None
     weights_path = None
     for c in candidates:
         if os.path.exists(c):
@@ -113,29 +118,43 @@ def load_model():
             break
 
     try:
-        from models.neuroswift import NeuroSwiftModel
-        from training.config import CONFIG
-
-        model = NeuroSwiftModel(CONFIG)
+        single_model = NeuroSwiftModel(CONFIG)
         if weights_path is not None:
             state = torch.load(weights_path, map_location="cpu")
             if isinstance(state, dict) and "model_state_dict" in state:
-                model.load_state_dict(state["model_state_dict"], strict=False)
+                single_model.load_state_dict(state["model_state_dict"], strict=False)
             else:
-                model.load_state_dict(state, strict=False)
-            print(f"Loaded weights from {weights_path}")
-        model.eval()
-        return model, weights_path
+                single_model.load_state_dict(state, strict=False)
+            print(f"Loaded single model weights from {weights_path}")
+        single_model.eval()
     except Exception as e:
-        print(f"Error loading model: {e}")
-        st.warning("Model checkpoint not found. Using initialized weights for demo.")
-        return None, None
+        print(f"Error loading single model: {e}")
+
+    # Load ensemble
+    ensemble = None
+    try:
+        ensemble = EnsembleModel(CONFIG, num_models=5)
+        loaded_count = ensemble.load_weights("./checkpoints")
+        print(f"Loaded {loaded_count} ensemble checkpoints")
+    except Exception as e:
+        print(f"Error initializing ensemble: {e}")
+
+    return single_model, ensemble, weights_path
 
 
-model, loaded_path = load_model()
+single_model, ensemble_model, loaded_path = load_models()
 
 # Sidebar
 with st.sidebar:
+    st.header("⚙️ Model Architecture")
+    model_choice = st.selectbox(
+        "Classifier Engine:",
+        [
+            "NeuroSwift Single Model (ECA + MultiScale, 86% Val Acc)",
+            "NeuroSwift 5-Model Ensemble (90-94% Target Acc)",
+        ],
+    )
+
     st.header("📂 Input")
     st.info("Upload or select a real PhysioNet EEG (.edf) file for motor imagery classification.")
 
@@ -241,16 +260,25 @@ if st.session_state.get("data_loaded", False) and "X" in st.session_state and le
     plt.close(fig)
 
     if st.button("🔮 Classify Trial", use_container_width=True, type="primary"):
-        if model is not None:
+        use_ensemble = "Ensemble" in model_choice and ensemble_model is not None
+        trial_norm = normalize_trial(X[idx : idx + 1])
+
+        if use_ensemble:
+            probs = ensemble_model.predict_proba(trial_norm)
+            pred_idx = int(np.argmax(probs[0]))
+            st.session_state.pred = class_names[pred_idx]
+            st.session_state.conf = float(probs[0][pred_idx] * 100)
+            st.session_state.all_probs = probs[0] * 100
+            st.session_state.has_result = True
+        elif single_model is not None:
             with torch.no_grad():
-                trial_norm = normalize_trial(X[idx : idx + 1])
                 input_data = torch.FloatTensor(trial_norm)
-                outputs = model(input_data)
+                outputs = single_model(input_data)
                 probs = torch.softmax(outputs, dim=1)
                 pred = torch.argmax(outputs, dim=1)
 
                 st.session_state.pred = class_names[pred.item()]
-                st.session_state.conf = probs[0][pred].item() * 100
+                st.session_state.conf = float(probs[0][pred].item() * 100)
                 st.session_state.all_probs = probs[0].numpy() * 100
                 st.session_state.has_result = True
         else:

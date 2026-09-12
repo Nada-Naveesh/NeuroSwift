@@ -71,15 +71,45 @@ def create_dataloaders(X, y, config):
     return train_loader, val_loader, test_loader, X_test, y_test, class_weight_dict
 
 
-def train_with_early_stopping(model, train_loader, val_loader, config, class_weights=None):
+def train_with_early_stopping(model, *args, **kwargs):
+    """
+    Train model with early stopping and learning rate scheduling.
+    Supports both calling conventions:
+      1. train_with_early_stopping(model, train_loader, val_loader, config, class_weights=None)
+      2. train_with_early_stopping(model, X_train, y_train, X_val, y_val, config)
+    """
+    if len(args) == 5:
+        # Called as (model, X_train, y_train, X_val, y_val, config)
+        X_train, y_train, X_val, y_val, config = args
+        class_weights = kwargs.get("class_weights", None)
+        batch_size = config.get("batch_size", 32)
+        train_ds = TensorDataset(
+            torch.FloatTensor(X_train) if not isinstance(X_train, torch.Tensor) else X_train.float(),
+            torch.LongTensor(y_train) if not isinstance(y_train, torch.Tensor) else y_train.long(),
+        )
+        val_ds = TensorDataset(
+            torch.FloatTensor(X_val) if not isinstance(X_val, torch.Tensor) else X_val.float(),
+            torch.LongTensor(y_val) if not isinstance(y_val, torch.Tensor) else y_val.long(),
+        )
+        train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
+        val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False)
+    elif len(args) >= 3:
+        # Called as (model, train_loader, val_loader, config, [class_weights])
+        train_loader = args[0]
+        val_loader = args[1]
+        config = args[2]
+        class_weights = args[3] if len(args) > 3 else kwargs.get("class_weights", None)
+    else:
+        raise ValueError("Invalid arguments passed to train_with_early_stopping")
+
     device = next(model.parameters()).device if list(model.parameters()) else torch.device("cpu")
-    optimizer = torch.optim.Adam(
+    optimizer = torch.optim.AdamW(
         model.parameters(),
-        lr=config["learning_rate"],
-        weight_decay=config["weight_decay"],
+        lr=config.get("learning_rate", 0.0005),
+        weight_decay=config.get("weight_decay", 1e-4),
     )
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", factor=0.5, patience=5
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+        optimizer, T_0=10, T_mult=2, eta_min=1e-6
     )
 
     if class_weights is not None:
@@ -137,7 +167,7 @@ def train_with_early_stopping(model, train_loader, val_loader, config, class_wei
             f"Val Accuracy: {val_accuracy:.2f}%"
         )
 
-        scheduler.step(avg_val_loss)
+        scheduler.step()
         history["train_loss"].append(avg_train_loss)
         history["val_loss"].append(avg_val_loss)
         history["val_accuracy"].append(val_accuracy)
