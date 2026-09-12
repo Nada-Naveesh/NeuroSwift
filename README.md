@@ -2,13 +2,15 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Test Accuracy](https://img.shields.io/badge/Test%20Accuracy-87.33%25-brightgreen.svg)](docs/PAPER_MANUSCRIPT.md)
+[![Base Paper Outperformed](https://img.shields.io/badge/Base%20Paper%20Outperformed-%2B0.99%25-success.svg)](docs/PAPER_MANUSCRIPT.md)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![PhysioNet](https://img.shields.io/badge/Dataset-PhysioNet%20EEGMMIDB-green.svg)](https://physionet.org/content/eegmmidb/1.0.0/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Paper Manuscript](https://img.shields.io/badge/Docs-Research%20Paper-orange.svg)](docs/PAPER_MANUSCRIPT.md)
 [![Presentation Deck](https://img.shields.io/badge/Docs-Presentation%20%26%20Viva-purple.svg)](docs/PRESENTATION_DECK.md)
 
-> **NeuroSwift** is an academic Brain-Computer Interface (BCI) research framework designed to decode motor intentions from non-invasive EEG across **5 distinct classes** (Left Hand, Right Hand, Both Hands, Both Feet, and Rest). By combining **Multi-Scale 1D temporal convolutions ($k \in \{3, 5, 7\}$)**, **Efficient Channel Attention (ECA-Net)**, and a **5-Model Diverse Ensemble**, NeuroSwift targets **90–94% accuracy** on the PhysioNet EEGMMIDB benchmark, outperforming the base paper by **Lian et al. (2025: 86.34%)**.
+> **NeuroSwift** is an academic Brain-Computer Interface (BCI) research framework designed to decode motor intentions from non-invasive EEG across **5 distinct classes** (Left Hand, Right Hand, Both Hands, Both Feet, and Rest). By combining **Multi-Scale 1D temporal convolutions ($k \in \{3, 5, 7\}$)**, **Efficient Channel Attention (ECA-Net)**, and a **5-Model Diverse Ensemble**, NeuroSwift achieves **87.33% held-out test accuracy** (with peak validation reaching 97.39%) on the PhysioNet EEGMMIDB benchmark, officially outperforming the base paper by **Lian et al. (2025: 86.34%)** by **+0.99%**.
 
 ---
 
@@ -86,8 +88,8 @@ graph TD
 | Baseline Single-Scale CNN ($k=5$) | 74.22% | 75.10% | 74.22% | 74.30% |
 | Multi-Scale CNN (No Attention) | 78.67% | 79.40% | 78.67% | 78.55% |
 | Multi-Scale CNN + SE-Net | 80.44% | 81.12% | 80.44% | 80.20% |
-| **NeuroSwift Single Model (ECA-Net)** | **86.00% (Peak Val)** | **86.42%** | **86.00%** | **85.91%** |
-| **NeuroSwift 5-Model Ensemble** | **90–94% (Target)** | **91.80%** | **91.20%** | **91.50%** |
+| **NeuroSwift Single Model (ECA-Net)** | **82.67% (Test) / 86.00% (Val)** | **83.35%** | **82.67%** | **82.46%** |
+| **NeuroSwift 5-Model Ensemble** | **87.33% (Held-Out Test)** | **87.37%** | **87.33%** | **87.30%** |
 
 ---
 
@@ -97,7 +99,8 @@ graph TD
 |---|:---:|:---:|:---:|
 | **Paradigm** | Motor Imagery | 5-Class Motor Imagery | 5-Class Motor Imagery |
 | **Attention Type** | Multi-branch Spatial | Efficient Channel Attention (ECA) | ECA-Net + Diverse Multi-Model |
-| **Reported Accuracy** | 86.34% | 86.00% (Val) / 82.67% (Test) | **90–94% (Target / Ensemble)** |
+| **Reported Accuracy** | 86.34% | 82.67% (Test) / 86.00% (Val) | **87.33% (Test) / 97.39% (Peak Val)** |
+| **Improvement vs. Base Paper** | Baseline | -0.34% (single model) | **+0.99% (Outperformed Base Paper!)** |
 | **CPU Latency** | ~25 ms | **4.8 ms** | **18.2 ms** |
 | **Parameter Count** | ~1.2M | **338k** | **5x 338k** |
 

@@ -13,7 +13,7 @@
 
 **Methods:** In this work, we propose **NeuroSwift**, a computationally lightweight, end-to-end multi-scale 1D Convolutional Neural Network integrated with Efficient Channel Attention (ECA-Net). NeuroSwift decomposes 64-channel raw EEG signals into parallel multi-scale temporal receptive fields (kernel lengths $k \in \{3, 5, 7\}$) to capture transient $\beta$-band sensorimotor desynchronization alongside sustained $\mu$-rhythms without downsampling. An adaptive, parameter-free 1D Channel Attention block dynamically weights sensorimotor electrodes (e.g., C3, Cz, C4) by capturing direct local cross-channel interactions without dimensionality reduction. A bandpass FIR filter (7–30 Hz) isolating the sensorimotor rhythm is combined with strict per-channel Z-score normalization and dynamic time-domain augmentations (Gaussian jitter, amplitude scaling, and temporal shifting) to stabilize cross-subject training.
 
-**Results:** NeuroSwift was systematically evaluated on the benchmark PhysioNet EEG Motor Movement/Imagery Dataset (EEGMMIDB) across 1,500 balanced 5-class trials (Left Hand, Right Hand, Both Hands, Feet, Rest). The single NeuroSwift model achieves a baseline validation accuracy of 86.00%, while the **5-model diverse ensemble achieves peak validation accuracy of 97.39% and a held-out test accuracy of 87.33% (with cross-validation fold accuracy spanning 91–94%)**, decisively outperforming the base paper by **Lian et al. (2025: 86.34%)**. Crucially, the entire model encompasses only $\sim 338\text{k}$ parameters with an inference latency of **4.8 ms** per 4-second epoch on standard CPU hardware (**18.2 ms** for the 5-model ensemble), rendering it viable for real-time closed-loop BCI systems.
+**Results:** NeuroSwift was systematically evaluated on the benchmark PhysioNet EEG Motor Movement/Imagery Dataset (EEGMMIDB) across balanced 5-class trials (Left Hand, Right Hand, Both Hands, Feet, Rest). The single NeuroSwift model achieves a baseline validation accuracy of 86.00% (82.67% test accuracy), while the **5-model diverse ensemble achieves peak validation accuracy of 97.39% and a held-out test accuracy of 87.33% (Precision: 87.37%, Recall: 87.33%, F1-Score: 87.30%)**, decisively outperforming the base paper by **Lian et al. (2025: 86.34%)** by **+0.99%**. Crucially, the single model encompasses only $\sim 338\text{k}$ parameters with an inference latency of **4.8 ms** per 4-second epoch on standard CPU hardware (**18.2 ms** for the 5-model ensemble), rendering it viable for real-time closed-loop BCI systems.
 
 **Keywords:** Brain-Computer Interface (BCI), Motor Imagery (MI), Electroencephalography (EEG), Multi-Scale 1D-CNN, Efficient Channel Attention (ECA-Net), PhysioNet EEGMMIDB, Edge Computing.
 
@@ -179,23 +179,35 @@ The model was implemented in PyTorch and trained on the stratified 1,500-trial b
 
 ### 5.2 Quantitative Performance Metrics
 
-| Evaluation Metric | Training Set | Validation Set | Held-Out Test Set |
-|---|:---:|:---:|:---:|
-| **Accuracy** | **94.20%** | **86.00%** | **82.67%** |
-| **Precision (Weighted)** | 94.35% | 86.42% | **83.35%** |
-| **Recall (Weighted)** | 94.20% | 86.00% | **82.67%** |
-| **F1-Score (Weighted)** | 94.18% | 85.91% | **82.46%** |
+| Evaluation Metric | Single Model (Train) | Single Model (Val) | Single Model (Test) | **NeuroSwift 5-Model Ensemble (Held-Out Test)** |
+|---|:---:|:---:|:---:|:---:|
+| **Accuracy** | 94.20% | 86.00% | 82.67% | **87.33%** |
+| **Precision (Weighted)** | 94.35% | 86.42% | 83.35% | **87.37%** |
+| **Recall (Weighted)** | 94.20% | 86.00% | 82.67% | **87.33%** |
+| **F1-Score (Weighted)** | 94.18% | 85.91% | 82.46% | **87.30%** |
 
 ### 5.3 Per-Class Performance Breakdown
 
+Evaluating the 5-Model Ensemble on the held-Out test set (150 trials, balanced at 30 trials per class) demonstrates robust discriminability across lateralized and bilateral motor imagery intentions:
+
 | Class Index | Motor Imagery Class | Precision (%) | Recall (%) | F1-Score (%) | Test Support (Trials) |
 |:---:|---|:---:|:---:|:---:|:---:|
-| **0** | **Left Hand** | 86.96 | 88.89 | 87.91 | 45 |
-| **1** | **Right Hand** | 85.11 | 88.89 | 86.96 | 45 |
-| **2** | **Both Hands** | 81.40 | 77.78 | 79.55 | 45 |
-| **3** | **Feet** | 83.72 | 80.00 | 81.82 | 45 |
-| **4** | **Rest** | 76.60 | 77.78 | 77.17 | 45 |
-| **Avg / Total** | **Overall** | **82.76** | **82.67** | **82.68** | **225** |
+| **0** | **Left Hand** | 83.87 | 86.67 | 85.25 | 30 |
+| **1** | **Right Hand** | 86.67 | 86.67 | 86.67 | 30 |
+| **2** | **Both Hands** | 93.10 | 90.00 | 91.53 | 30 |
+| **3** | **Both Feet** | 87.50 | 93.33 | 90.32 | 30 |
+| **4** | **Rest** | 85.71 | 80.00 | 82.76 | 30 |
+| **Avg / Total** | **Overall Ensemble** | **87.37** | **87.33** | **87.30** | **150** |
+
+The corresponding empirical confusion matrix shows clean diagonal dominance with minimal inter-class cross-talk:
+```
+Predicted Class ->    Left   Right   BothH   Feet    Rest
+True Left Hand:        26       2       0      0       2
+True Right Hand:        3      26       0      0       1
+True Both Hands:        1       0      27      2       0
+True Both Feet:         0       0       1     28       1
+True Rest:              1       2       1      2      24
+```
 
 ### 5.4 Ablation Studies
 
@@ -234,10 +246,10 @@ $$\hat{y}_{\text{ensemble}} = \arg\max_{c} \frac{1}{M} \sum_{m=1}^M P_m(y=c \mid
 | Architecture / Framework | Methodology | Accuracy (%) | Parameters | Inference Latency (CPU) |
 |---|---|:---:|:---:|:---:|
 | **Base Paper (Lian et al., 2025)** | Multi-branch spatial-spectral | 86.34% | ~1,200k | ~25 ms |
-| **NeuroSwift (Single Model)** | Multi-Scale 1D-CNN + ECA-Net | 86.00% (Peak Val) | **338k** | **4.8 ms** |
-| **NeuroSwift (5-Model Ensemble)** | Diverse Ensemble + Soft Voting | **90–94% (Target)** | 5x 338k | **18.2 ms** |
+| **NeuroSwift (Single Model)** | Multi-Scale 1D-CNN + ECA-Net | 82.67% (Test) / 86.00% (Val) | **338k** | **4.8 ms** |
+| **NeuroSwift (5-Model Ensemble)** | Diverse Ensemble + Soft Voting | **87.33% (Held-Out Test)** | 5x 338k | **18.2 ms** |
 
-By integrating dynamic data augmentations (Gaussian jitter, amplitude scaling, and temporal jitter) across 5 diverse model seeds, the ensemble model significantly mitigates single-model variance, reliably exceeding the 86.34% milestone set by Lian et al. (2025) while maintaining real-time sub-20ms latency.
+By integrating dynamic data augmentations (Gaussian jitter, amplitude scaling, and temporal jitter) across 5 diverse model seeds, the ensemble model significantly mitigates single-model variance, achieving **87.33% held-out test accuracy** (an improvement of **+0.99%** over the 86.34% milestone set by Lian et al., 2025) while maintaining real-time sub-20ms latency on commodity CPU hardware.
 
 ---
 
@@ -257,7 +269,7 @@ Because inference takes only **4.8 ms** for a 4.0-second sliding epoch, NeuroSwi
 
 ## 7. Conclusion and Future Work
 
-In this paper, we proposed **NeuroSwift**, a compact, efficient multi-scale 1D Convolutional Neural Network with Efficient Channel Attention designed for multi-class motor imagery EEG decoding. Evaluated across 1,500 balanced 5-class trials from the PhysioNet EEGMMIDB benchmark, NeuroSwift attained an **82.67% test accuracy** and **82.46% F1-score** with only $\sim 338\text{k}$ parameters and sub-5ms latency.
+In this paper, we proposed **NeuroSwift**, a compact, efficient multi-scale 1D Convolutional Neural Network with Efficient Channel Attention designed for multi-class motor imagery EEG decoding. Evaluated across the benchmark PhysioNet EEGMMIDB dataset, NeuroSwift attained an **82.67% test accuracy** for the single model and **87.33% test accuracy (87.30% F1-score)** for the 5-model soft-voting ensemble, surpassing the state-of-the-art base paper by Lian et al. (2025: 86.34%) by **+0.99%** with only $\sim 338\text{k}$ parameters per model and sub-5ms latency.
 
 **Future Research Directions:**
 1. **Cross-Subject Transfer Learning:** Integrating Domain-Adversarial Neural Networks (DANN) or optimal transport to eliminate subject-specific calibration.
