@@ -88,6 +88,7 @@ class BCIIV2aProcessor:
     def extract_trials(self, data, session_type='T'):
         """
         Extract trials from loaded .mat data.
+        Supports both official Graz University struct format and standard 3D arrays.
 
         BCI IV 2a class mapping:
         1 -> 0: Left Hand
@@ -95,13 +96,37 @@ class BCIIV2aProcessor:
         3 -> 2: Both Feet
         4 -> 3: Tongue
         """
+        # Check for Graz University BCI IV 2a struct format
+        if 'data' in data and hasattr(data['data'], 'shape') and len(data['data']) > 0:
+            runs = data['data'][0]
+            if len(runs) > 0 and hasattr(runs[0], 'dtype') and runs[0].dtype.names and 'trial' in runs[0].dtype.names:
+                trials_list = []
+                labels_list = []
+                for r in runs:
+                    if 'trial' not in r.dtype.names or 'y' not in r.dtype.names:
+                        continue
+                    trials = r['trial'][0, 0].flatten()
+                    labels = r['y'][0, 0].flatten()
+                    if len(trials) == 0:
+                        continue
+                    fs = float(r['fs'][0, 0][0, 0])
+                    continuous = r['X'][0, 0][:, :22]
+                    for t_start, y_val in zip(trials, labels):
+                        s_start = int(t_start + 2.0 * fs)
+                        s_end = s_start + int(self.window_duration * fs)
+                        if s_end <= len(continuous):
+                            epoch = continuous[s_start:s_end, :].T  # (22, samples)
+                            trials_list.append(epoch)
+                            labels_list.append(int(y_val) - 1 if int(y_val) >= 1 else int(y_val))
+                if len(trials_list) > 0:
+                    return np.array(trials_list, dtype=np.float32), np.array(labels_list, dtype=np.int64)
+
         # Look for standard keys 'X' and 'y'
         if 'X' in data:
             X = data['X']
-        elif 'data' in data:
+        elif 'data' in data and not isinstance(data['data'][0], np.void):
             X = data['data']
         else:
-            # Check for struct keys
             valid_keys = [k for k in data.keys() if not k.startswith('__')]
             if valid_keys:
                 X = data[valid_keys[0]]
@@ -120,7 +145,6 @@ class BCIIV2aProcessor:
         # Ensure X is 3D: (n_trials, 22, n_samples)
         X = np.asarray(X, dtype=np.float32)
         if X.ndim == 2:
-            # (channels, samples) -> single trial
             X = np.expand_dims(X, axis=0)
 
         # Convert 1-indexed (1, 2, 3, 4) to 0-indexed (0, 1, 2, 3)
@@ -134,10 +158,52 @@ class BCIIV2aProcessor:
         """
         Complete processing pipeline for one subject file:
         Load -> Extract -> Resample -> Bandpass Filter -> Z-Score Normalization
+        Handles continuous filtering on Graz format to eliminate boundary filter transients.
         """
         data = self.load_mat_file(file_path)
         if data is None:
             return None, None
+
+        # Check for Graz University BCI IV 2a struct format
+        if 'data' in data and hasattr(data['data'], 'shape') and len(data['data']) > 0:
+            runs = data['data'][0]
+            if len(runs) > 0 and hasattr(runs[0], 'dtype') and runs[0].dtype.names and 'trial' in runs[0].dtype.names:
+                trials_list = []
+                labels_list = []
+                for r in runs:
+                    if 'trial' not in r.dtype.names or 'y' not in r.dtype.names:
+                        continue
+                    trials = r['trial'][0, 0].flatten()
+                    labels = r['y'][0, 0].flatten()
+                    if len(trials) == 0:
+                        continue
+                    fs = float(r['fs'][0, 0][0, 0])
+                    continuous = r['X'][0, 0][:, :22]
+                    
+                    # Zero-phase Butterworth bandpass filter (7-30 Hz) on continuous run
+                    nyq = fs / 2.0
+                    b, a = signal.butter(4, [7.0 / nyq, 30.0 / nyq], btype='band')
+                    filtered = signal.filtfilt(b, a, continuous, axis=0)
+
+                    for t_start, y_val in zip(trials, labels):
+                        # Visual cue starts 2.0s after fixation start
+                        s_start = int(t_start + 2.0 * fs)
+                        s_end = s_start + int(self.window_duration * fs)
+                        if s_end <= len(filtered):
+                            epoch = filtered[s_start:s_end, :]  # (1000, 22)
+                            if fs != self.target_sr:
+                                epoch = signal.resample(epoch, self.window_samples, axis=0)
+                            epoch = epoch.T  # (22, 640)
+                            mean = np.mean(epoch, axis=-1, keepdims=True)
+                            std = np.std(epoch, axis=-1, keepdims=True) + 1e-8
+                            normed = (epoch - mean) / std
+                            trials_list.append(normed)
+                            labels_list.append(int(y_val) - 1 if int(y_val) >= 1 else int(y_val))
+
+                if len(trials_list) > 0:
+                    X = np.array(trials_list, dtype=np.float32)
+                    y = np.array(labels_list, dtype=np.int64)
+                    return X, y
 
         X, y = self.extract_trials(data, session_type)
 
