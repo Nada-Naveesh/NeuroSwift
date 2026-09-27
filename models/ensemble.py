@@ -22,6 +22,15 @@ class EnsembleModel:
         self.config = dict(config)
         self.num_models = num_models
 
+        # Adaptive calibration head for ensemble logits
+        num_classes = config.get('num_classes', 5)
+        self.calibrator = nn.Sequential(
+            nn.Linear(num_classes, 32),
+            nn.ReLU(),
+            nn.Linear(32, num_classes)
+        )
+        self.calibrator_loaded = False
+
         # Create models with distinct random seeds
         for i in range(num_models):
             torch.manual_seed(i * 42 + 7)
@@ -80,6 +89,13 @@ class EnsembleModel:
                 model.eval()
                 loaded += 1
 
+        calib_path = os.path.join(checkpoint_dir, "ensemble_calibrator.pt")
+        if os.path.exists(calib_path):
+            self.calibrator.load_state_dict(torch.load(calib_path, map_location="cpu"))
+            self.calibrator.eval()
+            self.calibrator_loaded = True
+            print("Successfully loaded ensemble probability calibration head!")
+
         print(f"Successfully loaded all {loaded}/{self.num_models} ensemble models!")
         return loaded
 
@@ -108,20 +124,27 @@ class EnsembleModel:
         return np.array(final_pred)
 
     def predict_proba(self, X):
-        """Average probabilities across models (soft voting)."""
-        all_probs = []
+        """Average probabilities across models with calibrated soft voting."""
+        all_logits = []
 
         for model in self.models:
             model.eval()
             with torch.no_grad():
                 tensor_X = torch.FloatTensor(X) if not isinstance(X, torch.Tensor) else X.float()
                 outputs = model(tensor_X)
-                probs = torch.softmax(outputs, dim=1)
-                all_probs.append(probs.cpu().numpy())
+                all_logits.append(outputs)
 
-        return np.mean(all_probs, axis=0)
+        mean_logits = torch.stack(all_logits).mean(dim=0)
+        if self.calibrator_loaded:
+            with torch.no_grad():
+                calib_logits = self.calibrator(mean_logits)
+            probs = torch.softmax(calib_logits, dim=-1)
+        else:
+            probs = torch.softmax(mean_logits, dim=-1)
+
+        return probs.cpu().numpy()
 
     def predict_soft(self, X):
-        """Soft voting prediction using averaged probability distributions."""
+        """Soft voting prediction using calibrated probability distributions."""
         probs = self.predict_proba(X)
         return np.argmax(probs, axis=1)

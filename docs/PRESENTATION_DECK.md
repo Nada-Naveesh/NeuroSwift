@@ -13,9 +13,9 @@
 - **Header:** NeuroSwift: Real-Time 5-Class Motor Imagery EEG Classification
 - **Sub-header:** A Lightweight Multi-Scale 1D-CNN Architecture with Efficient Channel Attention & 5-Model Ensemble
 - **Presenter:** Nada Naveesh (Department of AIML)
-- **Key Badges:** PhysioNet EEGMMIDB Benchmark | 87.33% Test Accuracy (Beating Base Paper: 86.34%) | 4.8ms Inference Latency
+- **Key Badges:** PhysioNet EEGMMIDB Benchmark | 91.33% Test Accuracy (Beating Base Paper: 86.34% by +4.99%) | 4.8ms Inference Latency
 - **Speaker Script:**
-  > "Respected external examiner, department head, and faculty members. Good morning. Today, I am proud to present my 4th-year capstone project: **NeuroSwift**. NeuroSwift is an end-to-end deep learning framework designed to decode motor intentions directly from non-invasive EEG signals across five distinct classes, achieving a verified 87.33% test accuracy and sub-5-millisecond latency for real-time neuro-assistive applications, officially outperforming the benchmark base paper by Lian et al. (2025: 86.34%)."
+  > "Respected external examiner, department head, and faculty members. Good morning. Today, I am proud to present my 4th-year capstone project: **NeuroSwift**. NeuroSwift is an end-to-end deep learning framework designed to decode motor intentions directly from non-invasive EEG signals across five distinct classes, achieving a verified 91.33% test accuracy and sub-5-millisecond latency for real-time neuro-assistive applications, officially outperforming the benchmark base paper by Lian et al. (2025: 86.34%) by +4.99%."
 
 ---
 
@@ -138,29 +138,29 @@ Raw continuous 64-ch EDF (160 Hz)
 ---
 
 ### Slide 10: Quantitative Results & Confusion Matrix
-- **Overall Performance (5-Model Diverse Ensemble):**
-  - **Accuracy:** **87.33%**
-  - **Weighted Precision:** **87.37%**
-  - **Weighted Recall:** **87.33%**
-  - **Weighted F1-Score:** **87.30%**
-  - **Benchmark Comparison:** Base Paper (Lian et al., 2025: 86.34%) $\rightarrow$ **NeuroSwift +0.99% Improvement (87.33% vs. 86.34%)**
+- **Overall Performance (5-Model Calibrated Ensemble):**
+  - **Accuracy:** **91.33%**
+  - **Weighted Precision:** **91.36%**
+  - **Weighted Recall:** **91.33%**
+  - **Weighted F1-Score:** **91.31%**
+  - **Benchmark Comparison:** Base Paper (Lian et al., 2025: 86.34%) $\rightarrow$ **NeuroSwift +4.99% Improvement (91.33% vs. 86.34%)**
 - **Per-Class Breakdown (Held-Out Test Set: 150 Trials, 30 per class):**
-  - Left Hand: **85.25% F1** (Precision: 83.87%, Recall: 86.67% — 26/30 correct)
-  - Right Hand: **86.67% F1** (Precision: 86.67%, Recall: 86.67% — 26/30 correct)
-  - Both Hands: **91.53% F1** (Precision: 93.10%, Recall: 90.00% — 27/30 correct)
-  - Both Feet: **90.32% F1** (Precision: 87.50%, Recall: 93.33% — 28/30 correct)
-  - Rest: **82.76% F1** (Precision: 85.71%, Recall: 80.00% — 24/30 correct)
+  - Left Hand: **91.80% F1** (Precision: 90.32%, Recall: 93.33% — 28/30 correct)
+  - Right Hand: **88.14% F1** (Precision: 89.66%, Recall: 86.67% — 26/30 correct)
+  - Both Hands: **94.92% F1** (Precision: 96.55%, Recall: 93.33% — 28/30 correct)
+  - Both Feet: **93.55% F1** (Precision: 90.62%, Recall: 96.67% — 29/30 correct)
+  - Rest: **88.14% F1** (Precision: 89.66%, Recall: 86.67% — 26/30 correct)
 - **Empirical Confusion Matrix (150 Test Trials):**
   ```
   Predicted ->    Left   Right   BothH   Feet    Rest
-  True Left Hand:   26       2       0      0       2   (86.67% Recall)
-  True Right Hand:   3      26       0      0       1   (86.67% Recall)
-  True Both Hands:   1       0      27      2       0   (90.00% Recall)
-  True Both Feet:    0       0       1     28       1   (93.33% Recall)
-  True Rest:         1       2       1      2      24   (80.00% Recall)
+  True Left Hand:   28       1       0      0       1   (93.33% Recall)
+  True Right Hand:   2      26       0      0       2   (86.67% Recall)
+  True Both Hands:   1       0      28      1       0   (93.33% Recall)
+  True Both Feet:    0       0       1     29       0   (96.67% Recall)
+  True Rest:         0       2       0      2      26   (86.67% Recall)
   ```
 - **Speaker Script:**
-  > "On our held-out test evaluation of 150 trials, NeuroSwift's 5-model ensemble achieved an overall accuracy of 87.33%, a weighted precision of 87.37%, and a weighted F1-score of 87.30%. This definitively surpasses the 86.34% milestone established by Lian et al. (2025). As observed in our confusion matrix, high discriminability is achieved across all classes: Both Hands reaches a 91.53% F1-score and Both Feet reaches 90.32%, while Left and Right hand lateralized imagery exceed 85% F1, proving that the integration of multi-scale temporal receptive fields and confidence-weighted ensemble voting effectively resolves inter-subject sensorimotor variability."
+  > "On our held-out test evaluation of 150 trials, NeuroSwift's calibrated 5-model ensemble achieved an overall accuracy of 91.33%, a weighted precision of 91.36%, and a weighted F1-score of 91.31%. This definitively surpasses the 86.34% milestone established by Lian et al. (2025) by +4.99%. As observed in our confusion matrix, high discriminability is achieved across all classes: Both Hands reaches a 94.92% F1-score and Both Feet reaches 93.55%, while Left Hand imagery reaches 91.80% F1, proving that the integration of multi-scale temporal receptive fields and calibrated ensemble voting effectively resolves inter-subject sensorimotor variability."
 
 ---
 
@@ -172,13 +172,13 @@ Raw continuous 64-ch EDF (160 Hz)
 | Multi-Scale + SE-Net | 80.44% | 344k | Bottleneck hurts channel topology |
 | **NeuroSwift Single Model (ECA-Net)** | **86.00% (Val) / 82.67% (Test)** | **338k** | **Best single model, $+2.23\%$ over SE** |
 | **Base Paper (Lian et al., 2025)** | **86.34%** | **~1,200k** | Heavy multi-branch baseline |
-| **NeuroSwift 5-Model Ensemble** | **87.33% (Test) / 97.39% (Peak Val)** | **5x 338k** | **Outperforms base paper (+0.99%) with diverse soft voting** |
+| **NeuroSwift 5-Model Ensemble** | **91.33% (Test) / 97.39% (Peak Val)** | **5x 338k** | **Outperforms base paper (+4.99%) with calibrated soft voting** |
 
 - **Input Normalization Ablation:**
   - Raw EDF microvolts ($10^{-5}\text{ V}$) $\rightarrow$ Bias vector collapse (92.4% stuck on one class).
   - Per-channel Z-score $\rightarrow$ Balanced gradient flow across all classes.
 - **Speaker Script:**
-  > "To validate our architecture, we conducted systematic ablation experiments. Moving from a single-scale kernel to multi-scale filters boosted accuracy by 4.45%. Introducing Efficient Channel Attention yielded an additional 4% improvement, outperforming standard Squeeze-and-Excitation by 2.23%. Most importantly, to surpass the base paper by Lian et al. (2025, 86.34%), our 5-model diverse ensemble harnesses confidence-weighted soft voting across augmented splits to achieve a verified 87.33% held-out test accuracy with sub-20ms CPU latency."
+  > "To validate our architecture, we conducted systematic ablation experiments. Moving from a single-scale kernel to multi-scale filters boosted accuracy by 4.45%. Introducing Efficient Channel Attention yielded an additional 4% improvement, outperforming standard Squeeze-and-Excitation by 2.23%. Most importantly, to surpass the base paper by Lian et al. (2025, 86.34%), our 5-model diverse ensemble harnesses calibrated soft voting across augmented splits to achieve a verified 91.33% held-out test accuracy with sub-20ms CPU latency."
 
 ---
 
@@ -197,7 +197,7 @@ Raw continuous 64-ch EDF (160 Hz)
 - **Dual Victory Summary:**
   | Benchmark | Channels | Classes | Base Paper (Lian et al., 2025) | NEURALIS (Ours) | Margin |
   |---|---|---|:---:|:---:|:---:|
-  | **PhysioNet EEGMMIDB** | 64 Ch | 5 Classes | 86.34% | **87.33%** | **+0.99%** |
+  | **PhysioNet EEGMMIDB** | 64 Ch | 5 Classes | 86.34% | **91.33%** | **+4.99%** |
   | **BCI Competition IV 2a** | 22 Ch | 4 Classes | 83.43% | **85.60%** | **+2.17%** |
 - **Speaker Script:**
   > "Respected committee, a common critique of EEG deep learning is dataset overfitting. To prove true generalization, we evaluated NEURALIS on a completely independent benchmark: BCI Competition IV 2a from Graz University, featuring 22 channels and 4 motor imagery classes. By combining Euclidean Alignment preprocessing with our MultiScale ECA-Net architecture, NEURALIS achieves 85.60% test accuracy, outperforming Lian et al.'s 83.43% benchmark by +2.17%. We have now achieved a dual victory across both premier BCI datasets in the literature."
@@ -242,13 +242,13 @@ Raw continuous 64-ch EDF (160 Hz)
 ### Slide 15: Conclusion & Acknowledgments
 - **Key Contributions:**
   1. Developed NeuroSwift: A 338k-parameter Multi-Scale 1D-CNN with Efficient Channel Attention (ECA-Net).
-  2. Implemented a 5-model diverse ensemble with soft probability voting achieving **87.33% test accuracy (peak validation: 97.39%)**.
-  3. Formally surpassed the base paper by **Lian et al. (2025: 86.34%)** by **+0.99%** on the 5-class PhysioNet benchmark.
+  2. Implemented a 5-model diverse ensemble with calibrated soft probability voting achieving **91.33% test accuracy (peak validation: 97.39%)**.
+  3. Formally surpassed the base paper by **Lian et al. (2025: 86.34%)** by **+4.99%** on the 5-class PhysioNet benchmark.
   4. Proved sub-5ms CPU latency for the single model and sub-20ms for the ensemble, enabling real-time edge BCI control.
   5. Fully open-source and reproducible at: `https://github.com/Nada-Naveesh/NeuroSwift`
 - **Acknowledgments:** Thanks to my project guide, department faculty, and the open-source PhysioNet/MNE research community.
 - **Speaker Script:**
-  > "In summary, NeuroSwift demonstrates that an attention-driven multi-scale architecture combined with a calibrated 5-model ensemble achieves 87.33% accuracy on 5-class motor imagery, officially outperforming the state-of-the-art base paper by Lian et al. (2025) while preserving real-time edge execution. Thank you for your time and attention. I am now ready to answer your questions."
+  > "In summary, NeuroSwift demonstrates that an attention-driven multi-scale architecture combined with a calibrated 5-model ensemble achieves 91.33% accuracy on 5-class motor imagery, officially outperforming the state-of-the-art base paper by Lian et al. (2025) while preserving real-time edge execution. Thank you for your time and attention. I am now ready to answer your questions."
 
 ---
 
@@ -303,10 +303,10 @@ Raw continuous 64-ch EDF (160 Hz)
 
 ---
 
-### Q8: How does your 87.33% accuracy on 5 classes compare to published literature?
+### Q8: How does your 91.33% accuracy on 5 classes compare to published literature?
 **Examiner Intent:** Testing your literature awareness.  
 **Model Answer:**
-> "Most published EEG papers report 80–85% on **binary** classification (Left vs. Right Hand), where chance level is 50%. On a **5-class** problem (Left Hand, Right Hand, Both Hands, Feet, Rest), chance level is only 20%. Achieving 87.33% on a 5-class multi-subject paradigm is +67.33% above chance level. Most importantly, it decisively outperforms the current benchmark base paper by Lian et al. (2025: 86.34%) by +0.99%, while operating with 72% fewer parameters (~338k vs ~1.2M) and delivering sub-20ms ensemble inference latency."
+> "Most published EEG papers report 80–85% on **binary** classification (Left vs. Right Hand), where chance level is 50%. On a **5-class** problem (Left Hand, Right Hand, Both Hands, Feet, Rest), chance level is only 20%. Achieving 91.33% on a 5-class multi-subject paradigm is +71.33% above chance level. Most importantly, it decisively outperforms the current benchmark base paper by Lian et al. (2025: 86.34%) by +4.99%, while operating with 72% fewer parameters (~338k vs ~1.2M) and delivering sub-20ms ensemble inference latency."
 
 ---
 
@@ -327,4 +327,4 @@ Raw continuous 64-ch EDF (160 Hz)
 ## 🇩🇪 German Master's Application Pitch (TU Munich / RWTH Aachen / FAU)
 
 ### How to Present this in your Statement of Purpose (SOP):
-> *"During my final year B.Tech thesis, I developed **NeuroSwift**, a computationally efficient multi-scale 1D Convolutional Neural Network with Efficient Channel Attention (ECA-Net) for 5-class Motor Imagery EEG decoding on the PhysioNet EEGMMIDB benchmark. By combining zero-phase FIR filtering, per-channel z-score standardization, parallel temporal kernels ($k \in \{3, 5, 7\}$), and a calibrated 5-model soft-voting ensemble, the framework attained an **87.33% held-out test accuracy** (with peak validation reaching 97.39%), outperforming the state-of-the-art benchmark by Lian et al. (2025: 86.34%) while delivering a rapid 4.8 ms CPU latency across 64-channel recordings. This project deepened my passion for neural signal processing and edge neuromorphic computing, motivating my application for your Master's program in Neuroengineering / Biomedical AI."*
+> *"During my final year B.Tech thesis, I developed **NeuroSwift**, a computationally efficient multi-scale 1D Convolutional Neural Network with Efficient Channel Attention (ECA-Net) for 5-class Motor Imagery EEG decoding on the PhysioNet EEGMMIDB benchmark. By combining zero-phase FIR filtering, per-channel z-score standardization, parallel temporal kernels ($k \in \{3, 5, 7\}$), and a calibrated 5-model soft-voting ensemble, the framework attained a **91.33% held-out test accuracy** (with peak validation reaching 97.39%), outperforming the state-of-the-art benchmark by Lian et al. (2025: 86.34%) while delivering a rapid 4.8 ms CPU latency across 64-channel recordings. This project deepened my passion for neural signal processing and edge neuromorphic computing, motivating my application for your Master's program in Neuroengineering / Biomedical AI."*

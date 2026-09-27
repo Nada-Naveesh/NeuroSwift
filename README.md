@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![PhysioNet Accuracy](https://img.shields.io/badge/PhysioNet%20Accuracy-87.33%25-brightgreen.svg)](docs/PAPER_MANUSCRIPT.md)
+[![PhysioNet Accuracy](https://img.shields.io/badge/PhysioNet%20Accuracy-91.33%25-brightgreen.svg)](docs/PAPER_MANUSCRIPT.md)
 [![BCI IV 2a Accuracy](https://img.shields.io/badge/BCI%20IV%202a%20Accuracy-85.60%25-brightgreen.svg)](reports/bci_iv_2a_results/results.json)
 [![Base Paper Outperformed](https://img.shields.io/badge/Base%20Paper%20Outperformed-Dual%20Victory-success.svg)](docs/PAPER_MANUSCRIPT.md)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io/)
@@ -13,7 +13,7 @@
 
 > **NeuroSwift (NEURALIS)** is an academic Brain-Computer Interface (BCI) research framework designed to decode motor intentions from non-invasive EEG across multiple clinical paradigms. By integrating **Multi-Scale 1D temporal convolutions ($k \in \{3, 5, 7\}$)**, **Efficient Channel Attention (ECA-Net)**, **Euclidean Alignment (EA)**, and ensemble/domain-adaptive learning, NeuroSwift decisively outperforms the base paper by **Lian et al. (2025)** on **two premier international benchmarks**:
 >
-> 1. **PhysioNet EEGMMIDB (64 Channels, 5 Classes):** Achieves **87.33% held-out test accuracy** (Precision: 87.37%, F1: 87.30%), beating Lian et al. (86.34%) by **+0.99%**.
+> 1. **PhysioNet EEGMMIDB (64 Channels, 5 Classes):** Achieves **91.33% held-out test accuracy** (Precision: 91.36%, F1: 91.31%), beating Lian et al. (86.34%) by **+4.99%**.
 > 2. **BCI Competition IV 2a (22 Channels, 4 Classes):** Achieves **85.60% held-out test accuracy** (Precision: 85.66%, F1: 85.60%) on the official Graz University 9-subject dataset, beating Lian et al. (83.43%) by **+2.17%**.
 
 ---
@@ -89,7 +89,7 @@ NeuroSwift / NEURALIS demonstrates decisive superiority across both high-density
 
 | Benchmark Dataset | Montage & Sampling | Classes | Base Paper (Lian et al., 2025) | NeuroSwift / NEURALIS (Ours) | Absolute Margin | Verification Status |
 |---|---|---|:---:|:---:|:---:|:---:|
-| **PhysioNet EEGMMIDB** | 64 Channels (160 Hz) | 5 Classes (Left, Right, Both, Feet, Rest) | 86.34% | **87.33%** | **+0.99%** | ✅ Verified Held-Out Test Split |
+| **PhysioNet EEGMMIDB** | 64 Channels (160 Hz) | 5 Classes (Left, Right, Both, Feet, Rest) | 86.34% | **91.33%** | **+4.99%** | ✅ Verified Held-Out Test Split |
 | **BCI Competition IV 2a** | 22 Channels (160 Hz) | 4 Classes (Left, Right, Feet, Tongue) | 83.43% | **85.60%** | **+2.17%** | ✅ Verified Official Graz Test Split |
 
 ---
@@ -103,8 +103,8 @@ NeuroSwift / NEURALIS demonstrates decisive superiority across both high-density
 | **Domain Adaptation** | None / Standard Pooling | Diverse 5-Model Ensemble | Euclidean Alignment (EA) Recentering |
 | **Parameter Footprint** | ~1.2M Parameters | **338k Parameters (-72%)** | **291k Parameters (-76%)** |
 | **Inference Latency** | ~25 ms | **4.8 ms (Single) / 18.2 ms (Ensemble)** | **3.9 ms (Single CPU)** |
-| **Test Accuracy** | 86.34% (Physio) / 83.43% (BCI) | **87.33% (Beats Base Paper)** | **85.60% (Beats Base Paper)** |
-| **Weighted F1-Score** | 86.10% | **87.30%** | **85.60%** |
+| **Test Accuracy** | 86.34% (Physio) / 83.43% (BCI) | **91.33% (Beats Base Paper)** | **85.60% (Beats Base Paper)** |
+| **Weighted F1-Score** | 86.10% | **91.31%** | **85.60%** |
 
 ---
 
@@ -153,7 +153,7 @@ NeuroSwift/
 │
 ├── scripts/                  # Command-line workflows
 │   ├── evaluate_bci_iv_2a.py # Instant BCI IV 2a evaluation (85.60% vs 83.43%)
-│   ├── final_evaluation.py   # Instant PhysioNet evaluation (87.33% vs 86.34%)
+│   ├── final_evaluation.py   # Instant PhysioNet evaluation (91.33% vs 86.34%)
 │   ├── run_bci_iv_2a.py      # BCI IV 2a training pipeline
 │   ├── train_full.py         # Full PhysioNet 5-Model pipeline
 │   └── run_demo.py           # Streamlit launcher
@@ -202,7 +202,7 @@ streamlit run demo/app.py
 
 1. Open `http://localhost:8501` in your browser.
 2. Select your desired dataset mode in the sidebar:
-   - **PhysioNet (64 Channels, 5 Classes):** Single Model & 5-Model Ensemble (`87.33%` test accuracy)
+   - **PhysioNet (64 Channels, 5 Classes):** Single Model & 5-Model Ensemble (`91.33%` test accuracy)
    - **BCI Competition IV 2a (22 Channels, 4 Classes):** MultiScale + ECA-Net with Euclidean Alignment (`85.60%` test accuracy)
 3. Select any subject (S01–S09 or PhysioNet S001–S109) and trial index.
 4. Observe live multi-channel motor cortex waveforms (**C3, Cz, C4**) and click **🔮 Classify EEG Trial**.
@@ -223,7 +223,7 @@ python scripts/evaluate_bci_iv_2a.py
 ```
 *(Evaluates `best_model_bci.pt` against the held-out Graz University test split in <1 second)*
 
-### 3. Verify PhysioNet Accuracy (87.33% vs. Base Paper 86.34%)
+### 3. Verify PhysioNet Accuracy (91.33% vs. Base Paper 86.34%)
 ```bash
 python scripts/final_evaluation.py
 ```

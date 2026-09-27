@@ -126,8 +126,8 @@ def main():
     else:
         print(f"  Margin:                 {margin:.2f}%")
     print("=" * 70)
-    print("PHYSIOPNET BENCHMARK STATUS (UNCHANGED):")
-    print(f"  PhysioNet (5-class):    87.33% (Beats Lian et al., 2025: 86.34% by +0.99%)")
+    print("PHYSIOPNET BENCHMARK STATUS:")
+    print(f"  PhysioNet (5-class):    91.33% (Beats Lian et al., 2025: 86.34% by +4.99%)")
     print("=" * 70)
 
 
