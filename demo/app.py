@@ -217,13 +217,7 @@ with st.sidebar:
     # --------------------------------------
     if dataset_choice.startswith("PhysioNet"):
         st.header("⚙️ PhysioNet Architecture")
-        model_choice = st.selectbox(
-            "Classifier Engine:",
-            [
-                "NeuroSwift Single Model (ECA + MultiScale, 86% Val Acc)",
-                "NeuroSwift 5-Model Ensemble (91.33% Test Acc - Beats Base Paper)"
-            ]
-        )
+        st.success("🧠 **NeuroSwift 5-Model Ensemble** (91.33% Test Acc — Beats Base Paper)")
 
         st.header("📂 PhysioNet Input")
         st.info("Upload or select a real PhysioNet EEG (.edf) file.")
@@ -421,10 +415,9 @@ if dataset_choice.startswith("PhysioNet"):
         plt.close(fig)
 
         if st.button("🔮 Classify PhysioNet Trial", use_container_width=True, type="primary", key="btn_pn"):
-            use_ensemble = "Ensemble" in model_choice and ensemble_model is not None
             trial_norm = normalize_trial(X[idx : idx + 1])
 
-            if use_ensemble:
+            if ensemble_model is not None:
                 probs = ensemble_model.predict_proba(trial_norm)
                 pred_idx = int(np.argmax(probs[0]))
                 st.session_state.pn_pred = pn_class_names[pred_idx]
@@ -443,7 +436,7 @@ if dataset_choice.startswith("PhysioNet"):
                     st.session_state.pn_all_probs = probs[0].numpy() * 100
                     st.session_state.pn_has_result = True
             else:
-                st.warning("Model not loaded.")
+                st.warning("PhysioNet ensemble model not loaded.")
 
         if st.session_state.get("pn_has_result", False):
             st.subheader("🎯 Prediction Result (5 Classes)")

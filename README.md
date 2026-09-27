@@ -202,7 +202,7 @@ streamlit run demo/app.py
 
 1. Open `http://localhost:8501` in your browser.
 2. Select your desired dataset mode in the sidebar:
-   - **PhysioNet (64 Channels, 5 Classes):** Single Model & 5-Model Ensemble (`91.33%` test accuracy)
+   - **PhysioNet (64 Channels, 5 Classes):** Calibrated 5-Model Ensemble (`91.33%` test accuracy)
    - **BCI Competition IV 2a (22 Channels, 4 Classes):** MultiScale + ECA-Net with Euclidean Alignment (`85.60%` test accuracy)
 3. Select any subject (S01–S09 or PhysioNet S001–S109) and trial index.
 4. Observe live multi-channel motor cortex waveforms (**C3, Cz, C4**) and click **🔮 Classify EEG Trial**.
