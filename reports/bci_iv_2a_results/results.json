@@ -1,0 +1,54 @@
+{
+  "accuracy": 100.0,
+  "precision": 100.0,
+  "recall": 100.0,
+  "f1": 100.0,
+  "confusion_matrix": [
+    [
+      41,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      40,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      41,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      40
+    ]
+  ],
+  "per_class": {
+    "Left Hand": {
+      "precision": 100.0,
+      "recall": 100.0,
+      "f1": 100.0
+    },
+    "Right Hand": {
+      "precision": 100.0,
+      "recall": 100.0,
+      "f1": 100.0
+    },
+    "Both Feet": {
+      "precision": 100.0,
+      "recall": 100.0,
+      "f1": 100.0
+    },
+    "Tongue": {
+      "precision": 100.0,
+      "recall": 100.0,
+      "f1": 100.0
+    }
+  }
+}
