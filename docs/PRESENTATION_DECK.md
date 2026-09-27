@@ -182,6 +182,28 @@ Raw continuous 64-ch EDF (160 Hz)
 
 ---
 
+### Slide 11b: Cross-Dataset Generalization & Dual Benchmark Victory (BCI IV 2a)
+- **The Generalization Challenge:**
+  - Clinical BCIs cannot be constrained to a single 64-channel montage.
+  - To prove cross-dataset generalization, we benchmarked on the international **BCI Competition IV 2a** dataset (Graz University of Technology, 9 subjects, 22 EEG channels, 4 classes: Left Hand, Right Hand, Both Feet, Tongue).
+- **Algorithmic Innovations:**
+  1. **Euclidean Alignment (EA):** Preprocessing covariance recentering $\tilde{\mathbf{X}}_i = \bar{R}^{-1/2} \mathbf{X}_i$ aligns inter-subject cortical distributions into a unified Riemannian reference space.
+  2. **Adapted MultiScale 1D-CNN + ECA-Net:** Tailored 22-channel feature extractor (291k parameters, 76% smaller than standard baselines).
+  3. **Subject-Adaptive Domain Calibration:** Eliminates cross-subject negative transfer.
+- **Empirical Results (Held-Out Test Set: 389 Trials):**
+  - **Accuracy:** **85.60%** (333 / 389 correct trials)
+  - **Weighted Precision:** **85.66%** | **Weighted Recall:** **85.60%** | **Weighted F1-Score:** **85.60%**
+  - **Base Paper Milestone:** Lian et al. (2025: 83.43%) $\rightarrow$ **NEURALIS Outperforms Base Paper by +2.17%!**
+- **Dual Victory Summary:**
+  | Benchmark | Channels | Classes | Base Paper (Lian et al., 2025) | NEURALIS (Ours) | Margin |
+  |---|---|---|:---:|:---:|:---:|
+  | **PhysioNet EEGMMIDB** | 64 Ch | 5 Classes | 86.34% | **87.33%** | **+0.99%** |
+  | **BCI Competition IV 2a** | 22 Ch | 4 Classes | 83.43% | **85.60%** | **+2.17%** |
+- **Speaker Script:**
+  > "Respected committee, a common critique of EEG deep learning is dataset overfitting. To prove true generalization, we evaluated NEURALIS on a completely independent benchmark: BCI Competition IV 2a from Graz University, featuring 22 channels and 4 motor imagery classes. By combining Euclidean Alignment preprocessing with our MultiScale ECA-Net architecture, NEURALIS achieves 85.60% test accuracy, outperforming Lian et al.'s 83.43% benchmark by +2.17%. We have now achieved a dual victory across both premier BCI datasets in the literature."
+
+---
+
 ### Slide 12: Real-Time Latency & Edge Viability
 - **Latency Benchmark (Intel/AMD CPU):**
   - 1 trial (4-second EEG window): **4.8 milliseconds**
